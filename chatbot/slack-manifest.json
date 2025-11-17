@@ -1,0 +1,38 @@
+{
+  "display_information": {
+    "name": "DOGPT",
+    "description": "This dog knows docs, ask him something",
+    "background_color": "#1a171a"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "DOGPT",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "user": [
+        "admin"
+      ],
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "chat:write",
+        "groups:history",
+        "im:history",
+        "mpim:history",
+        "reactions:read",
+        "reactions:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://foo.execute-api.us-east-1.amazonaws.com/slack",
+      "bot_events": [
+        "app_mention"
+      ]
+    }
+  }
+}

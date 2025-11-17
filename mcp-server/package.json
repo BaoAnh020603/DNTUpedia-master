@@ -1,0 +1,25 @@
+{
+  "scripts": {
+    "dev": "tsx src/mcp_server_dev.ts",
+    "prebuild": "rimraf dist",
+    "build": "rolldown --config ./rolldown.config.mjs",
+    "postbuild": "cd dist && zip mcp_server.zip mcp_server.mjs",
+    "predeploy": "npm run build",
+    "deploy": "aws lambda update-function-code --function-name \"$KNOWLEDGE_BASE_MCP_SERVER_FUNCTION_NAME\" --zip-file fileb://./dist/mcp_server.zip"
+  },
+  "devDependencies": {
+    "@hono/node-server": "^1.14.1",
+    "@types/node": "^22.15.9",
+    "rimraf": "^6.0.1",
+    "rolldown": "^1.0.0-beta.8",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.803.0",
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "fetch-to-node": "^2.1.0",
+    "hono": "^4.7.8",
+    "zod": "^3.24.4"
+  }
+}

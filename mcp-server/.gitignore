@@ -1,0 +1,7 @@
+dist
+node_modules
+# docs
+scripts/*.json
+terraform/*
+!terraform/*.tf
+.env

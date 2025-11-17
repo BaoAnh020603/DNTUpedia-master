@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNTUpedia Chatbot</title>
+    <script type="module" src="https://unpkg.com/deep-chat@latest/dist/deep-chat.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: transparent;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chatbot-popup {
+            display: none;
+            position: fixed;
+            bottom: 110px;
+            right: 25px;
+            width: 400px;
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 2px solid #c8102e;
+            z-index: 1000;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .chatbot-popup.open {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #c8102e, #a50d25);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            gap: 12px;
+            position: relative;
+        }
+
+        .header-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .close-button {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-button:hover {
+            color: #ffcccc;
+        }
+
+        deep-chat {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        deep-chat::part(messages) {
+            padding: 15px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        deep-chat::part(message-user) {
+            background: #c8102e;
+            color: #fff;
+            border-radius: 15px 15px 0 15px;
+            padding: 12px 18px;
+            margin: 8px 0;
+            margin-left: auto;
+            max-width: 80%;
+            font-size: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        deep-chat::part(message-ai) {
+            background: #e8ecf4;
+            color: #333;
+            border-radius: 15px 15px 15px 0;
+            padding: 12px 18px;
+            margin: 8px 0;
+            margin-right: auto;
+            max-width: 80%;
+            font-size: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        deep-chat::part(input-area) {
+            border-radius: 15px;
+            border: 2px solid #c8102e;
+            padding: 10px;
+            background: #f9f9f9;
+            font-size: 15px;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        deep-chat::part(input-area)::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+
+        deep-chat::part(input-area) input {
+            color: #333;
+            flex: 1;
+        }
+
+        deep-chat::part(input-area) input::placeholder {
+            content: 'Nhập câu hỏi tại đây!';
+        }
+
+        deep-chat::part(submit-button) {
+            background: #c8102e;
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: none;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        deep-chat::part(submit-button):hover {
+            background: #a50d25;
+        }
+
+        deep-chat::part(file-picker) {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        deep-chat::part(file-picker) button {
+            background: #c8102e;
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 14px;
+            border: none;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        deep-chat::part(file-picker) button:hover {
+            background: #a50d25;
+        }
+
+        deep-chat::part(avatar) {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #c8102e;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        deep-chat::part(loading-message) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            color: #c8102e;
+            font-style: italic;
+        }
+
+        deep-chat::part(loading-message)::before {
+            content: '';
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #c8102e;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .chatbot-popup {
+                width: 90vw;
+                height: 70vh;
+                bottom: 15px;
+                right: 5px;
+                left: 5px;
+                margin: auto;
+            }
+
+            .chatbot-toggle {
+                width: 60px;
+                height: 60px;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .chatbot-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            deep-chat::part(message-user),
+            deep-chat::part(message-ai) {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="chatbot-toggle" onclick="toggleChatbot()">
+        <img src="http://localhost:3000/assets/DNTUChatbot.png" alt="DNTU Chatbot" class="chatbot-icon" />
+    </button>
+
+    <div class="chatbot-popup" id="chatbotPopup">
+        <div class="chat-header">
+            <img src="http://localhost:3000/assets/logoDNTU.png" alt="DNTU Logo" class="header-icon" />
+            DNTUpedia Chatbot
+            <button class="close-button" onclick="toggleChatbot()">✕</button>
+        </div>
+        <deep-chat style="width: 100%; height: 100%; border: none;"
+            intro-message='{"text": "Chào mừng đến với DNTUpedia Chatbot! Gõ tin nhắn để bắt đầu."}'
+            connect='{"url": "http://localhost:8080/mcp-chat"}' request-body-limits='{"maxMessages": -1}'
+            input-area-style='{"borderRadius": "15px", "borderColor": "#c8102e", "padding": "10px", "backgroundColor": "#f9f9f9"}'
+            file-picker='{"accept": ["image/*", "application/pdf"]}'
+            error-messages='{"displayServiceErrorMessages": true}' loading-message='{"text": "Đang xử lý..."}'
+            title='<div class="chat-title"><img src="http://localhost:3000/assets/logoDNTU.png" alt="DNTU Logo" class="title-icon">DNTUpedia Chatbot</div>'></deep-chat>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const chatbotPopup = document.getElementById('chatbotPopup');
+            chatbotPopup.classList.toggle('open');
+        }
+    </script>
+</body>
+
+</html>
